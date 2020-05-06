@@ -1,4 +1,4 @@
-# brightklass
+# Klass som håller reda på ljusaste punkten i bilden
 import cv2
 import numpy as np
 
