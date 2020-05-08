@@ -80,9 +80,6 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 	print("Xpid controller ready to go!")
 	while servoRuns.value:
 		err = center.value - loc.value
-#		print(str([center.value, loc.value]))
-#		print(str(err))
-#		print(str(output.value))
 		toUpdate = p.update(err) + 90
 
 		# Ändlägen
@@ -91,6 +88,7 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 		if toUpdate < 11:
 			toUpdate = 11
 		output.value = toUpdate
+
 #####################################################################
 #
 # pidKontrollerY: Regulerar vinkeln på motorn för upp-nedrörelse
