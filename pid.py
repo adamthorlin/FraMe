@@ -1,7 +1,7 @@
 # PID-kontroller
 import time
 
-# Klass för pid-kontrollern
+# Klass for pid-kontrollern
 class PID:
 	# Konstanta gains som publika attribut
 	def __init__(self, kP=0, kI=0, kD=0):
@@ -21,16 +21,16 @@ class PID:
 	
 	#################################################################
     #
-    # update: Uppdaterar värdet på utsignalen som en pid-kontroller
+    # update: Uppdaterar vardet pa utsignalen som en pid-kontroller
     #
-    # IN: Skillnaden mellan nuvarande utsignal och önskad utsignal (felet)
+    # IN: Skillnaden mellan nuvarande utsignal och onskad utsignal (felet)
     #
-    # OUT: Reglerade värdet på utsignalen
+    # OUT: Reglerade vardet pa utsignalen
     #
 	def update(self, err, delay = 0.2):
 		time.sleep(delay)
 		
-		# dt för diskret integration och derivata
+		# dt for diskret integration och derivata
 		self.tNuv = time.time()
 		dt = self.tNuv - self.tOld
 		dErr = err - self.oldErr
@@ -39,7 +39,7 @@ class PID:
 		
 		self.cI += err * dt # integraldel
 		
-		# 2020-03-23: Så att kameran inte kan fastna i ett ändläge för länge
+		# 2020-03-23: Sa att kameran inte kan fastna i ett andlage for lange
 		if self.cI > 150:
 			self.cI = 150 
 		if self.cI < -150:
@@ -51,8 +51,8 @@ class PID:
 		else:
 			self.cD = 0
 		
-		self.tOld = self.tNuv # För delta t
-		self.oldErr = err	  # För delta err
+		self.tOld = self.tNuv # For delta t
+		self.oldErr = err	  # For delta err
 		
 		# "Baka ihop" och returnera reglerad utsignal
 		P = self.kP * self.cP
