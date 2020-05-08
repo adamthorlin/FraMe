@@ -1,4 +1,9 @@
 # PID-kontroller
+# 
+# Property of Adam Thålin and Anton Grahn
+#
+# 2020-05-08
+
 import time
 
 # Klass for pid-kontrollern

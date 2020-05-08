@@ -1,3 +1,8 @@
+# brightKlass
+# 
+# Property of Adam Thålin and Anton Grahn
+#
+# 2020-05-08
 
 import cv2
 import numpy as np
