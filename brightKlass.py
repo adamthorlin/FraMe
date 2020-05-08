@@ -1,19 +1,24 @@
-# Klass som håller reda på ljusaste punkten i bilden
+
 import cv2
 import numpy as np
 
 
+# Klass för att hålla reda på ljusaste punken i bilden
 class Bright():
 	def __init__(self, radie):
 		self.radie = radie
 	
+    #################################################################
+    #
+    # bright: Tar en bild och returnerar koordinater för ljuste punkten i bilden
+    #
 	def bright(self, image): # update	
 		gray = cv2.GaussianBlur(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), (self.radie, self.radie), 0)
 		
-		# Ljusaste (x, y) 
+		# minMaxLoc returnerar koordinater för ljusaste och mörkaste punkten i bilden.
 		(minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(gray)
 
-		# Minigardering mot bug som gör att hörnet returneras om ingen ljusaste punkt hittas.
+		# Gardering mot bug som gör att hörnet returneras om ingen ljusaste punkt hittas
 		if maxLoc[0]==0 and maxLoc[1]==0:
 			maxLoc = [160, 120]
 

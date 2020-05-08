@@ -1,13 +1,15 @@
 # PID-kontroller
 import time
 
+# Klass för pid-kontrollern
 class PID:
-	# Konstanta gains
-	def __init__(self, kP=1, kI=0, kD=0):
+	# Konstanta gains som publika attribut
+	def __init__(self, kP=0, kI=0, kD=0):
 		self.kP = kP
 		self.kI = kI
 		self.kD = kD
 
+    # Initiera variabler
 	def initialize(self):
 		# delta t (tid)
 		self.tNuv = time.time()
@@ -17,7 +19,14 @@ class PID:
 		self.oldErr = 0
 		self.cP, self.cI, self.cD = 0, 0, 0
 	
-	# Uppdatera utsignalen baserat på felet
+	#################################################################
+    #
+    # update: Uppdaterar värdet på utsignalen som en pid-kontroller
+    #
+    # IN: Skillnaden mellan nuvarande utsignal och önskad utsignal (felet)
+    #
+    # OUT: Reglerade värdet på utsignalen
+    #
 	def update(self, err, delay = 0.2):
 		time.sleep(delay)
 		
@@ -45,7 +54,7 @@ class PID:
 		self.tOld = self.tNuv # För delta t
 		self.oldErr = err	  # För delta err
 		
-		# "Baka ihop" och returnera utsignal
+		# "Baka ihop" och returnera reglerad utsignal
 		P = self.kP * self.cP
 		I = self.kI * self.cI
 		D = self.kD * self.cD

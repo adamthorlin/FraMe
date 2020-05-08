@@ -15,14 +15,17 @@ import signal
 import numpy as np
 
 
-
-# Signalhaterare för CTRL+C
+#####################################################################
+#
+# Signalhaterare för CTRL+C: Fångar upp och avslutar programmet om KeyboardInterrupt inträffar
+#
 def CTRLC_handler(sig, frame):
 	print("CTRL+C pressed")
 	setAngles(90, 90, Manager().Value("r", False))
 	time.sleep(2)
 	cv2.destroyAllWindows()
 	sys.exit()
+
 #####################################################################
 #
 # obj_center: Läser in bild från kameran och uppdaterar koordinater för center och för objektet
@@ -68,7 +71,7 @@ def obj_center(objX, objY, cenX, cenY, radie, servoPin):
 #
 # piddKontrollerX: Regulerar vinkeln på motorn för höger-vänsterrörelse
 #
-# IN: Processäkra variabler: nuvarande vinkel, pid-konstanter, x-koordinater för center och för objektet
+# IN: Nuvarande vinkel, pid-konstanter, x-koordinater för center och för objektet
 #
 # OUT: Uppdaterar nuvarande vinkel för motorn i höger-vänsterled
 #
@@ -80,9 +83,6 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 	print("Xpid controller ready to go!")
 	while servoRuns.value:
 		err = center.value - loc.value
-#		print(str([center.value, loc.value]))
-#		print(str(err))
-#		print(str(output.value))
 		toUpdate = p.update(err) + 90
 
 		# Ändlägen
@@ -95,7 +95,7 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 #
 # pidKontrollerY: Regulerar vinkeln på motorn för upp-nedrörelse
 #
-# IN: Processäkra variabler: nuvarande vinkel, pid-konstanter, y-koordinater för center och för objektet
+# IN: Nuvarande vinkel, pid-konstanter, y-koordinater för center och för objektet
 #
 # OUT: Uppdaterar nuvarande vinkel för motorn uppåt/nedåt
 #
@@ -109,9 +109,6 @@ def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
 	print("Ypid controller ready to go!")
 	while servoRuns.value:
 		err = center.value - loc.value
-#		print(str([center.value, loc.value]))
-#		print(str(err))
-#		print(str(output.value))
 		toUpdate = p.update(err) + 90
 
 		# Ändlägen
@@ -124,7 +121,7 @@ def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
 #
 # setAngles: Omvandlar vinklar till motsvarande utsignal till respektive motor
 #
-# IN: Processäkra variabler: vinkar för respektive motor
+# IN: Vinkar för respektive motor
 #
 # OUT: Skickar utsignal till respektive motor för att sätta önskad vinkel
 #
@@ -153,11 +150,14 @@ def setAngles(Xangle, Yangle, servoRuns):
 		G = []
 		for XYpins in sys.argv[1:]:
 			G.append(int(XYpins))
+
+    # Visar felmeddelande och avslutar om fel antal GPIO-nummer har angivits
 	else:
 		print("setAngles NOT ready to go!")
 		print("Use programme this way: ")
 		print(">> python3 tracker3.py \nor")
 		print(">> python3 tracker3.py [pan-GPIO] [tilt-GPIO]")
+        print("where pan-GPIO is the GPIO-number for the pan motion motor\n and tilt-GPIO is the GPIO-number for the tilt motion motor")
 		print("Exiting setAngles")
 		servoRuns.value = False
 		exit()
@@ -200,7 +200,7 @@ if __name__ == "__main__":
 	with Manager() as manager:
 		# Process safe variables
 		
-		# Processer körs så länge s=True
+		# Tillståndsvariabel. Processer körs så länge s=True
 		s = manager.Value("r", True)
 		
 		# Vinklar
