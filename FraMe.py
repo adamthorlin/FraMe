@@ -1,6 +1,6 @@
 # Tracker program version 4
 #
-# Property of Adam Thålin and Anton Grahn
+# Property of Adam Thalin and Anton Grahn
 #
 # 2020-05-08
 
