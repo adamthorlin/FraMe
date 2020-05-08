@@ -12,19 +12,25 @@ import sys
 import time
 import pigpio # 2020-03-23: RPi.GPIO är kass
 import signal
-# import argparse
 import numpy as np
 
 
 
-# <ESC> är bättre
+# Signalhaterare för CTRL+C
 def CTRLC_handler(sig, frame):
 	print("CTRL+C pressed")
 	setAngles(90, 90, Manager().Value("r", False))
 	time.sleep(2)
 	cv2.destroyAllWindows()
 	sys.exit()
-   
+#####################################################################
+#
+# obj_center: Läser in bild från kameran och uppdaterar koordinater för center och för objektet
+#
+# IN: Processäkra variabler för respektive koordinat
+#
+# OUT: Uppdaterar processäkra variabler för motsvarande koordinater utifrån bild från kameran.
+#  
 def obj_center(objX, objY, cenX, cenY, radie, servoPin):
 	
 	print("obj_center ready to go!")
@@ -44,11 +50,7 @@ def obj_center(objX, objY, cenX, cenY, radie, servoPin):
 		locXY = obj.bright(frame)
 		objX.value, objY.value = locXY[0], -1*locXY[1]
 
-# 		För att printa objektets koordinater
-#		print(str([objX.value, objY.value]) + ", " + str([cenX.value, cenY.value]))
-		
-		# Endast för show. imshow funkar inte när man kör via ssh utan X-server
-		#orig = cv2.GaussianBlur(orig, (radie, radie), 0)
+        # Visar bilden på skärmen
 		orig = cv2.resize(orig, (1280, 720), interpolation = cv2.INTER_LINEAR)
 		cv2.circle(orig, (int(1280*objX.value/320), int(-720*objY.value/240)), radie, (0, 255, 0), 2)	
 		cv2.imshow("imshow", orig)
@@ -62,7 +64,14 @@ def obj_center(objX, objY, cenX, cenY, radie, servoPin):
 			break
 	
 
-	
+#####################################################################
+#
+# piddKontrollerX: Regulerar vinkeln på motorn för höger-vänsterrörelse
+#
+# IN: Processäkra variabler: nuvarande vinkel, pid-konstanter, x-koordinater för center och för objektet
+#
+# OUT: Uppdaterar nuvarande vinkel för motorn i höger-vänsterled
+#
 def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 	signal.signal(signal.SIGINT, CTRLC_handler)
 	p = PID(p.value, i.value, d.value)
@@ -82,7 +91,14 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 		if toUpdate < 11:
 			toUpdate = 11
 		output.value = toUpdate
-		
+#####################################################################
+#
+# pidKontrollerY: Regulerar vinkeln på motorn för upp-nedrörelse
+#
+# IN: Processäkra variabler: nuvarande vinkel, pid-konstanter, y-koordinater för center och för objektet
+#
+# OUT: Uppdaterar nuvarande vinkel för motorn uppåt/nedåt
+#
 def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
 	# Signal handler
 	signal.signal(signal.SIGINT, CTRLC_handler)
@@ -104,14 +120,14 @@ def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
 		if toUpdate < 40:
 			toUpdate = 40
 		output.value = toUpdate
-
-# Alternativ definition av ändlägen
-# def in_rangeY(val, lower = 1, upper = 177):
-#	return (val >= lower and val <= upper)
+#####################################################################
 #
-#def in_rangeX(val, lower = 1, upper = 177):
-#	return (val >= lower and val <= upper)
-	
+# setAngles: Omvandlar vinklar till motsvarande utsignal till respektive motor
+#
+# IN: Processäkra variabler: vinkar för respektive motor
+#
+# OUT: Skickar utsignal till respektive motor för att sätta önskad vinkel
+#
 def setAngles(Xangle, Yangle, servoRuns):
 	signal.signal(signal.SIGINT, CTRLC_handler)
 
@@ -153,15 +169,11 @@ def setAngles(Xangle, Yangle, servoRuns):
 		print("setAngles ready to go!")
 
 	while servoRuns.value:
-#		print(str([Xangle.value, Yangle.value]))
 
-#		if in_rangeX(Xangle.value):
 		pulseX = 1000 + 1000*Xangle.value/180
-#		if in_rangeY(Yangle.value):
 		pulseY = 1000 + 1000*Yangle.value/180
 		
 		pulses = [pulseX, pulseY]
-		# print(str(pulses))
 		
 		# Skickar PWM-signal till servos
 		for g in enumerate(G):
@@ -176,7 +188,11 @@ def setAngles(Xangle, Yangle, servoRuns):
 	pi.stop()
 	exit()	
 
-
+#####################################################################
+#
+# Main: Initierar processäkra variabler och definierar radien för objektet som ska spåras. Definierar och kör sedan processerna parallellt.
+#
+#
 if __name__ == "__main__":
 	
 	radius = 41 # Måste vara udda för Gaussian Blur
