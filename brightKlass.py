@@ -13,10 +13,10 @@ class Bright():
 	def __init__(self, radie):
 		self.radie = radie
 	
-    #################################################################
-    #
-    # bright: Tar en bild och returnerar koordinater for ljuste punkten i bilden
-    #
+#################################################################
+#
+# bright: Tar en bild och returnerar koordinater for ljuste punkten i bilden
+#
 	def bright(self, image): # update	
 		gray = cv2.GaussianBlur(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), (self.radie, self.radie), 0)
 		

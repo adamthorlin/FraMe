@@ -24,14 +24,14 @@ class PID:
 		self.oldErr = 0
 		self.cP, self.cI, self.cD = 0, 0, 0
 	
-	#################################################################
-    #
-    # update: Uppdaterar vardet pa utsignalen som en pid-kontroller
-    #
-    # IN: Skillnaden mellan nuvarande utsignal och onskad utsignal (felet)
-    #
-    # OUT: Reglerade vardet pa utsignalen
-    #
+#############################################################
+#
+# update: Uppdaterar vardet pa utsignalen som en pid-kontroller
+#
+# IN: Skillnaden mellan nuvarande utsignal och onskad utsignal (felet)
+#
+# OUT: Reglerade vardet pa utsignalen
+#
 	def update(self, err, delay = 0.2):
 		time.sleep(delay)
 		
