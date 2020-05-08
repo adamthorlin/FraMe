@@ -19,7 +19,7 @@ import signal
 import numpy as np
 
 
-# ###################################################################
+############################################################
 #
 # Signalhaterare for CTRL+C: Fangar upp och avslutar programmet om KeyboardInterrupt intraffar
 #
@@ -30,7 +30,7 @@ def CTRLC_handler(sig, frame):
 	cv2.destroyAllWindows()
 	sys.exit()
 
-# ###################################################################
+############################################################
 #
 # obj_center: Laser in bild fran kameran och uppdaterar koordinater for center och for objektet
 #
@@ -71,7 +71,7 @@ def obj_center(objX, objY, cenX, cenY, radie, servoPin):
 			break
 	
 
-# ###################################################################
+############################################################
 #
 # piddKontrollerX: Regulerar vinkeln pa motorn for hoger-vansterrorelse
 #
@@ -96,7 +96,7 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 			toUpdate = 11
 		output.value = toUpdate
 
-# ###################################################################
+############################################################
 #
 # pidKontrollerY: Regulerar vinkeln pa motorn for upp-nedrorelse
 #
@@ -122,7 +122,7 @@ def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
 		if toUpdate < 40:
 			toUpdate = 40
 		output.value = toUpdate
-# ###################################################################
+############################################################
 #
 # setAngles: Omvandlar vinklar till motsvarande utsignal till respektive motor
 #
@@ -193,7 +193,7 @@ def setAngles(Xangle, Yangle, servoRuns):
 	pi.stop()
 	exit()	
 
-# ###################################################################
+############################################################
 #
 # Main: Initierar processakra variabler och definierar radien for objektet som ska sparas. Definierar och kor sedan processerna parallellt.
 #
