@@ -13,7 +13,7 @@ class Bright():
 	def __init__(self, radie):
 		self.radie = radie
 	
-#################################################################
+###########################################################
 #
 # bright: Tar en bild och returnerar koordinater for ljuste punkten i bilden
 #
