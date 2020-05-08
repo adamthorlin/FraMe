@@ -10,7 +10,7 @@ import os
 import cv2
 import sys
 import time
-import pigpio # 2020-03-23: RPi.GPIO är kass
+import pigpio
 import signal
 import numpy as np
 
