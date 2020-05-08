@@ -91,6 +91,7 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 		if toUpdate < 11:
 			toUpdate = 11
 		output.value = toUpdate
+
 #####################################################################
 #
 # pidKontrollerY: Regulerar vinkeln på motorn för upp-nedrörelse
