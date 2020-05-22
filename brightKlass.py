@@ -39,7 +39,13 @@ class Bright():
 #########################################################
 # bright: Processes an image or video fram and returns #
 # coordinates for the brightest spot                  #
-######################################################
+#                                                    #
+# IN: Image/video frame                             #
+#                                                  #
+# OUT: Coordinates for the brightest spot of the  #
+#      processed image                           #
+#                                               #
+################################################
 
 	def bright(self, image):
                 
