@@ -125,7 +125,7 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 #     and object                                        #
 #                                                      #
 # OUT: Updates the process safe variable for the      #
-#      pan-angle                                     #
+#      tilt-angle                                    #
 #####################################################
 
 def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
