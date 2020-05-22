@@ -1,8 +1,24 @@
-# Tracker program version 4
-#
-# Property of Adam Thalin and Anton Grahn
-#
-# 2020-05-08
+############################################################
+##
+## Name         :   Frame.py
+##
+## Description  :   Main program for FraMe
+##
+############################################################
+##
+## Authors      :   Grahn, Anthon & Thalin
+##
+## Course       :   Bachelor's thesis in Mechatronics,
+##                  MF133XVT20
+##
+## Institute    :   Department of Mechatronics, School of
+##                  Industrial Engineering and Management,
+##                  Royal Institute of Technology, Stockholm
+##
+## Last edited  :   2020-05-22
+##
+############################################################
+############################################################
 
 from pid import PID
 from picamera import PiCamera
@@ -20,9 +36,10 @@ import numpy as np
 
 
 ############################################################
-#
-# Signalhaterare for CTRL+C: Fangar upp och avslutar programmet om KeyboardInterrupt intraffar
-#
+# Signalhandler for CTRL+C: Exits program in a desired way #
+# if KeyboardInterrupt is raised                          #
+##########################################################
+
 def CTRLC_handler(sig, frame):
 	print("CTRL+C pressed")
 	setAngles(90, 90, Manager().Value("r", False))
@@ -31,13 +48,17 @@ def CTRLC_handler(sig, frame):
 	sys.exit()
 
 ############################################################
-#
-# obj_center: Laser in bild fran kameran och uppdaterar koordinater for center och for objektet
-#
-# IN: Processakra variabler for respektive koordinat
-#
-# OUT: Uppdaterar processakra variabler for motsvarande koordinater utifran bild fran kameran.
-#  
+#                                                          #
+# obj_center: Captures a video frame with the camera and   #
+#             updates the 2D-coordinates for the center    #
+#             and the object                               #
+#                                                          #
+# IN: Process safe variables for each coordinate           #
+#                                                         #
+# OUT: Updates the process safe variables based on input #
+#      from the camera                                  #
+########################################################
+
 def obj_center(objX, objY, cenX, cenY, radie, servoPin):
 	
 	print("obj_center ready to go!")
@@ -46,9 +67,7 @@ def obj_center(objX, objY, cenX, cenY, radie, servoPin):
 	vs = VideoStream(usePiCamera=True, resolution=(320, 240)).start()
 	time.sleep(2.0)
 
-	# initiera brightKlass som Bright()	
 	obj = Bright(radie)
-	
 	
 	while servoPin.value:
 		frame = vs.read()
@@ -57,28 +76,29 @@ def obj_center(objX, objY, cenX, cenY, radie, servoPin):
 		locXY = obj.bright(frame)
 		objX.value, objY.value = locXY[0], -1*locXY[1]
 
-        # Visar bilden pa skarmen
+                # Display the image
 		orig = cv2.resize(orig, (1280, 720), interpolation = cv2.INTER_LINEAR)
 		cv2.circle(orig, (int(1280*objX.value/320), int(-720*objY.value/240)), radie, (0, 255, 0), 2)	
 		cv2.imshow("imshow", orig)
-		
 				
-		# <ESC> for att stanga video och doda programmet
+		# <ESC> to raise KeyboardInterrupt
 		if cv2.waitKey(1) == 27:
 			print("<ESC> pressed! \nPlease wait!")
 			servoPin.value = False
 			time.sleep(1)
 			break
 	
-
 ############################################################
-#
-# piddKontrollerX: Regulerar vinkeln pa motorn for hoger-vansterrorelse
-#
-# IN: Nuvarande vinkel, pid-konstanter, x-koordinater for center och for objektet
-#
-# OUT: Uppdaterar nuvarande vinkel for motorn i hoger-vansterled
-#
+#                                                          #
+# piddKontrollerX: Controls the angle of the servo that is #
+#                  responsible for the pan-motion          #
+#                                                          #
+# IN: Current angle, pid-gains, x-coordinates for center   #
+#     and object                                           #
+#                                                          #
+# OUT: Updates the process safe variable for the pan-angle #
+############################################################
+
 def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 	signal.signal(signal.SIGINT, CTRLC_handler)
 	p = PID(p.value, i.value, d.value)
@@ -89,7 +109,7 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 		err = center.value - loc.value
 		toUpdate = p.update(err) + 90
 
-		# Ändlagen
+		# Constraints
 		if toUpdate > 169:
 			toUpdate = 169
 		if toUpdate < 11:
@@ -97,18 +117,20 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 		output.value = toUpdate
 
 ############################################################
-#
-# pidKontrollerY: Regulerar vinkeln pa motorn for upp-nedrorelse
-#
-# IN: Nuvarande vinkel, pid-konstanter, y-koordinater for center och for objektet
-#
-# OUT: Uppdaterar nuvarande vinkel for motorn uppat/nedat
-#
+#                                                          #
+# piddKontrollerY: Controls the angle of the servo that is #
+#                  responsible for the tilt-motion         #
+#                                                         #
+# IN: Current angle, pid-gains, y-coordinates for center #
+#     and object                                        #
+#                                                      #
+# OUT: Updates the process safe variable for the      #
+#      pan-angle                                     #
+#####################################################
+
 def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
-	# Signal handler
 	signal.signal(signal.SIGINT, CTRLC_handler)
-	# Initiera pidkontrollern med valda gains
-	p = PID(p.value, i.value, d.value)
+        p = PID(p.value, i.value, d.value)
 	p.initialize()
 	
 	print("Ypid controller ready to go!")
@@ -123,40 +145,37 @@ def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
 			toUpdate = 40
 		output.value = toUpdate
 ############################################################
-#
-# setAngles: Omvandlar vinklar till motsvarande utsignal till respektive motor
-#
-# IN: Vinkar for respektive motor
-#
-# OUT: Skickar utsignal till respektive motor for att satta onskad vinkel
-#
+#                                                          #
+# setAngles: Converts the angle value for each servo to a #
+#            PWM signal and sets the desired angles      #
+#                                                       #
+# IN: Angles for both servos                           #
+#                                                     #
+# OUT: Sends PWM signal to the servos                #
+#                                                   #
+####################################################
+
 def setAngles(Xangle, Yangle, servoRuns):
 	signal.signal(signal.SIGINT, CTRLC_handler)
 
-	# Pin for pan
+	# Pin for pan servo
 	xPin = 2
-	# Pin for tilt
+	# Pin for tilt servo
 	yPin = 22
 
-	# MIN_WIDTH = 1000
-	# MAX_WIDTH = 2000
-
-	# GPIO-bibliotek
+	# GPIO-library
 	pi = pigpio.pi()
 
-	# Avsluta om pi inte hittas
 	if not pi.connected:
 		exit()
 	
-	# Sa att man kan valja pan/tilt GPIO-portar via sys.argv
+	# So that GPIO-pins also can be set with sys.argv
 	if len(sys.argv) == 1:
 		G = [xPin, yPin]
 	elif len(sys.argv) == 3:
 		G = []
 		for XYpins in sys.argv[1:]:
 			G.append(int(XYpins))
-
-    # Visar felmeddelande och avslutar om fel antal GPIO-nummer har angivits
 	else:
 		print("setAngles NOT ready to go!")
 		print("Use programme this way: ")
@@ -166,7 +185,8 @@ def setAngles(Xangle, Yangle, servoRuns):
 		print("Exiting setAngles")
 		servoRuns.value = False
 		exit()
-	# Satter servos till 90 deg	
+
+        # Start both servos in 90 degree angle
 	for g in G:
 		pi.set_servo_pulsewidth(g, 1500)
 
@@ -180,11 +200,9 @@ def setAngles(Xangle, Yangle, servoRuns):
 		
 		pulses = [pulseX, pulseY]
 		
-		# Skickar PWM-signal till servos
 		for g in enumerate(G):
 			pi.set_servo_pulsewidth(g[1], pulses[g[0]])
 
-	# Gar tillbaka till 90 deg innan avstangning
 	print("Shutting down servos")
 	for g in G:
 		pi.set_servo_pulsewidth(g, 1500)
@@ -194,49 +212,51 @@ def setAngles(Xangle, Yangle, servoRuns):
 	exit()	
 
 ############################################################
-#
-# Main: Initierar processakra variabler och definierar radien for objektet som ska sparas. Definierar och kor sedan processerna parallellt.
-#
-#
+#                                                          #
+# Main: Defines process safe variables and the radius for #
+#       the object to be tracked                         #
+#                                                       #
+########################################################
+
 if __name__ == "__main__":
 	
-	radius = 41 # Maste vara udda for Gaussian Blur
+	radius = 41 # Needs to be an odd integer
 
 	with Manager() as manager:
 		# Process safe variables
 		
-		# Tillstandsvariabel. Processer kors sa lange s=True
+		# Condition variabel
 		s = manager.Value("r", True)
 		
-		# Vinklar
+		# Angles
 		xAngle = manager.Value("i", 90)
 		yAngle = manager.Value("i", 90)
 		
-		# Koordinater for centrum
+		# Coordinates for center
 		centerX = manager.Value("i", 0)
 		centerY = manager.Value("i", 0)
 		
-		# Objektets x-/y-koordinater
+		# Coordinates for object
 		objX = manager.Value("i", 0)
 		objY = manager.Value("i", 0)
 		
-		# Gains for pan
+		# PID gains for pan servo
 		xP = manager.Value("f", 0.19)
 		xI = manager.Value("f", 0.22)
 		xD = manager.Value("f", 0.0038)
 		
-		# Gains for tilt
-		yP = manager.Value("f", 0.11) # 0.11
-		yI = manager.Value("f", 0.3) # 0.3
-		yD = manager.Value("f", 0.0042) # 0.0042
+		# PID gains for tilt servo
+		yP = manager.Value("f", 0.11)
+		yI = manager.Value("f", 0.3)
+		yD = manager.Value("f", 0.0042)
 		
-		# processer	
+		# Define processes	
 		pSnap = Process(target=obj_center, args=(objX, objY, centerX, centerY, radius, s))
 		pPIDx = Process(target=pidKontrollerX, args=(xAngle, xP, xI, xD, objX, centerX, s))
 		pPIDy = Process(target=pidKontrollerY, args=(yAngle, yP, yI, yD, objY, centerY, s))
 		pSetAngle = Process(target=setAngles, args=(xAngle, yAngle, s))
 		
-		# starta processerna
+		# Start
 		pSnap.start()
 		pPIDx.start()
 		pPIDy.start()
@@ -248,7 +268,7 @@ if __name__ == "__main__":
 		pPIDy.join()
 		pSetAngle.join()
 		
-		# doda
+		# Kill and exit program
 		cv2.destroyAllWindows()
 		print("END OF CODE, exiting...")
 		exit()
