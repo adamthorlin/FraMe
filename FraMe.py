@@ -20,12 +20,6 @@
 ############################################################
 ############################################################
 
-from pid import PID
-from picamera import PiCamera
-from brightKlass import Bright
-from multiprocessing import Manager
-from multiprocessing import Process
-from imutils.video import VideoStream
 import os
 import cv2
 import sys
@@ -33,7 +27,12 @@ import time
 import pigpio
 import signal
 import numpy as np
-
+from pid import PID
+from picamera import PiCamera
+from brightKlass import Bright
+from multiprocessing import Manager
+from multiprocessing import Process
+from imutils.video import VideoStream
 
 ############################################################
 # Signalhandler for CTRL+C: Exits program in a desired way #
@@ -76,7 +75,7 @@ def obj_center(objX, objY, cenX, cenY, radie, servoPin):
         locXY = obj.bright(frame)
         objX.value, objY.value = locXY[0], -1*locXY[1]
 
-                # Display the image
+        # Display the image
         orig = cv2.resize(orig, (1280, 720), interpolation = cv2.INTER_LINEAR)
         cv2.circle(orig, (int(1280*objX.value/320), int(-720*objY.value/240)), radie, (0, 255, 0), 2)    
         cv2.imshow("imshow", orig)
@@ -130,7 +129,7 @@ def pidKontrollerX(output, p, i, d, loc, center, servoRuns):
 
 def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
     signal.signal(signal.SIGINT, CTRLC_handler)
-        p = PID(p.value, i.value, d.value)
+    p = PID(p.value, i.value, d.value)
     p.initialize()
     
     print("Ypid controller ready to go!")
@@ -138,7 +137,7 @@ def pidKontrollerY(output, p, i, d, loc, center, servoRuns):
         err = center.value - loc.value
         toUpdate = p.update(err) + 90
 
-        # Ändlagen
+        # Constraints due to physical limitations
         if toUpdate > 97:
             toUpdate = 97
         if toUpdate < 40:

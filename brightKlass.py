@@ -49,21 +49,19 @@ class Bright():
 
     def bright(self, image):
                 
-                # Convert the image to black and grey and 
-                # blur it
+        # Convert the image to black and grey and 
+        # blur it
         
-                gray = cv2.GaussianBlur(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), (self.radie, self.radie), 0)
+        gray = cv2.GaussianBlur(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), (self.radie, self.radie), 0)
         
-                # Compute the coordinates
+        # Compute the coordinates
 
         (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(gray)
 
-        # Return coordinates for center if no
-                # brightest spot is found
+        # Return coordinates for center if no brightest 
+        # spot is found
 
         if maxLoc[0]==0 and maxLoc[1]==0:
             maxLoc = [160, 120]
 
         return maxLoc
-    
-        
