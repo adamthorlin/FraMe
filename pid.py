@@ -66,17 +66,17 @@ class PID:
 		
 		self.cI += err * dt
 
-		############################################
-		# 2020-03-23: Constraints so that the      #
-                #             integral-part does not go to #
-                #             infinity, which causes the   #
-                #             camera to be caught in an    #
-                #             end position                 #
-		if self.cI > 150:                          #
-			self.cI = 150                      #
-		if self.cI < -150:                         #
-			self.cI = -150                     #
-                ############################################
+		##########################################
+		# 2020-03-23: Constraints so that the    #
+                #             integral-part can't go to  #
+                #             infinity, which causes the #
+                #             camera to be caught in an  #
+                #             end position               #
+		if self.cI > 150:                        #
+			self.cI = 150                    #
+		if self.cI < -150:                       #
+			self.cI = -150                   #
+                ##########################################
 		
 		if dt > 0:
 			self.cD = (dErr/dt)
