@@ -24,7 +24,13 @@
 ##                  ****************************************
 ##
 ##                  No user interface is needed, but the
-##                  stream from the picamera can be
+##                  GPIO-pins for each servo motor can be
+##                  defined via commandline arguments. If
+##                  no arguments are given, default is set
+##                  to 2 and 22, for the pan- and tilt-servo
+##                  respectively.
+##
+##                  The stream from the picamera can be
 ##                  displayed locally or forwarded to an
 ##                  an external device via an 
 ##                  SSH-connection.
