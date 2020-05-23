@@ -1,6 +1,6 @@
 ############################################################
 ##
-## Name         :   Frame.py
+## Name         :   FraMe.py
 ##
 ## Description  :   This is the main script for FraMe. It is
 ##                  ran on a Raspberry Pi 3 B+ and controls
