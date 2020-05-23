@@ -2,8 +2,33 @@
 ##
 ## Name         :   Frame.py
 ##
-## Description  :   Main program for FraMe
+## Description  :   This is the main script for FraMe. It is
+##                  ran on a Raspberry Pi 3 B+ and controls
+##                  two servo motors that rotate a camera in
+##                  order to identfy a target and keep it
+##                  centered in the picture.
 ##
+##                  The script uses two classes that are put
+##                  in separate files:
+##
+##                  --"brightKlass.py"--
+##                  Contains the class that processes an
+##                  image and returns the coordinates for
+##                  the brightest spot in the prosessed
+##                  image. 
+##                  ****************************************
+##                  --"pid.py"--
+##                  Contains the class that defines the
+##                  PID-controller that is used to control
+##                  the angles of the servo motors.
+##                  ****************************************
+##
+##                  No user interface is needed, but the
+##                  stream from the picamera can be
+##                  displayed locally or forwarded to an
+##                  an external device via an 
+##                  SSH-connection.
+##                  
 ############################################################
 ##
 ## Authors      :   Grahn, Anthon & Thalin
@@ -36,7 +61,7 @@ from imutils.video import VideoStream
 
 ############################################################
 # Signalhandler for CTRL+C: Exits program in a desired way #
-# if KeyboardInterrupt is raised                          #
+# if KeyboardInterrupt is raised through CTRL+C           #
 ##########################################################
 
 def CTRLC_handler(sig, frame):
