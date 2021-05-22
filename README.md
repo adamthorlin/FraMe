@@ -12,7 +12,8 @@ Python code to my bachelor's thesis project in MF133X Mechatronics at KTH, Sprin
  Last edited  :   2020-05-22
 
  Name         :   FraMe.py                                                                                                           
- Description  :   FraMe.py is the main script for FraMe.
+ Description  :   
+                  FraMe.py is the main script for FraMe.
                   It is ran on a Raspberry Pi 3 B+ and 
                   controls two servo motors that rotate a
                   camera in order to identfy a target and
